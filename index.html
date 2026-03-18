@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HMR Profitability Calculator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        input[type=number]::-webkit-inner-spin-button, 
+        input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+        .calc-container { max-width: 500px; margin: 0 auto; }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen pb-12">
+
+    <div class="calc-container px-4 pt-8">
+        <!-- Header -->
+        <div class="text-center mb-6">
+            <h1 class="text-2xl font-bold text-slate-900">HMR Profit Calculator</h1>
+            <p class="text-slate-500 text-sm mt-1">Optimize your clinical service margins</p>
+        </div>
+
+        <!-- Calculator Card -->
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-6">
+            
+            <!-- Revenue Section -->
+            <section>
+                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Revenue (Standard 7CPA)</label>
+                <div class="relative">
+                    <span class="absolute left-3 top-2.5 text-slate-400 font-medium">$</span>
+                    <input type="number" id="baseFee" value="222.77" class="w-full pl-8 pr-4 py-2 bg-slate-100 border-none rounded-lg font-semibold text-slate-700 focus:ring-2 focus:ring-blue-500" readonly>
+                </div>
+                <p class="text-[10px] text-slate-400 mt-1">*Fixed fee for initial HMR service</p>
+            </section>
+
+            <hr class="border-slate-100">
+
+            <!-- Inputs Section -->
+            <section class="space-y-4">
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1">Pharmacist Hourly Rate ($)</label>
+                    <input type="number" id="hourlyRate" value="65" oninput="calculate()" class="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all">
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-1">Travel (mins)</label>
+                        <input type="number" id="travelTime" value="30" oninput="calculate()" class="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-1">Interview (mins)</label>
+                        <input type="number" id="interviewTime" value="45" oninput="calculate()" class="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1">Report Writing & Admin (mins)</label>
+                    <input type="number" id="reportTime" value="60" oninput="calculate()" class="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                </div>
+            </section>
+
+            <!-- Results Section -->
+            <section class="bg-blue-50 rounded-xl p-5 border border-blue-100">
+                <div class="flex justify-between items-end mb-4">
+                    <div>
+                        <p class="text-xs font-bold text-blue-600 uppercase tracking-widest">Net Profit</p>
+                        <h2 id="netProfit" class="text-4xl font-bold text-slate-900">$0.00</h2>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-xs font-medium text-slate-500">Margin</p>
+                        <p id="marginPercent" class="text-lg font-bold text-slate-700">0%</p>
+                    </div>
+                </div>
+
+                <div class="space-y-2 border-t border-blue-200 pt-4">
+                    <div class="flex justify-between text-sm">
+                        <span class="text-slate-600">Total Labor Cost</span>
+                        <span id="laborCost" class="font-semibold text-slate-900">$0.00</span>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                        <span class="text-slate-600">Effective Hourly Rate</span>
+                        <span id="effectiveRate" class="font-semibold text-green-600">$0.00/hr</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Upsell Section -->
+            <section class="bg-slate-900 rounded-xl p-4 text-white">
+                <div class="flex items-center justify-between mb-2">
+                    <h3 class="text-sm font-bold">Follow-up Potential</h3>
+                    <span class="bg-blue-500 text-[10px] px-2 py-0.5 rounded-full uppercase">Added Revenue</span>
+                </div>
+                <p class="text-xs text-slate-400 leading-relaxed mb-3">Maximize outcomes with funded follow-ups:</p>
+                <div class="grid grid-cols-2 gap-2">
+                    <div class="bg-slate-800 p-2 rounded-lg border border-slate-700 text-center">
+                        <p class="text-[10px] text-slate-400 uppercase">1st Review</p>
+                        <p class="text-sm font-bold text-blue-400">+$111.39</p>
+                    </div>
+                    <div class="bg-slate-800 p-2 rounded-lg border border-slate-700 text-center">
+                        <p class="text-[10px] text-slate-400 uppercase">2nd Review</p>
+                        <p class="text-sm font-bold text-blue-400">+$55.70</p>
+                    </div>
+                </div>
+            </section>
+
+            <div class="flex flex-col gap-2">
+                <button onclick="window.print()" class="w-full py-2 bg-slate-100 text-slate-600 rounded-lg text-sm font-medium hover:bg-slate-200 transition-colors">
+                    Download PDF Report
+                </button>
+                <button onclick="copyEmbedCode()" class="w-full py-2 bg-blue-600 text-white rounded-lg text-sm font-bold hover:bg-blue-700 transition-colors">
+                    Copy Discourse Embed Code
+                </button>
+            </div>
+        </div>
+
+        <footer class="mt-8 text-center px-4">
+            <p class="text-[11px] text-slate-400 leading-relaxed">
+                Calculations based on 7CPA Program Rules. Fees current as of March 2026. This is a business modeling tool and does not constitute financial advice.
+            </p>
+        </footer>
+    </div>
+
+    <script>
+        function calculate() {
+            const baseFee = 222.77;
+            const rate = parseFloat(document.getElementById('hourlyRate').value) || 0;
+            const travel = parseFloat(document.getElementById('travelTime').value) || 0;
+            const interview = parseFloat(document.getElementById('interviewTime').value) || 0;
+            const report = parseFloat(document.getElementById('reportTime').value) || 0;
+
+            const totalMinutes = travel + interview + report;
+            const totalHours = totalMinutes / 60;
+            const laborCost = totalHours * rate;
+            const netProfit = baseFee - laborCost;
+            
+            const margin = baseFee > 0 ? (netProfit / baseFee) * 100 : 0;
+            const effectiveRate = totalHours > 0 ? (baseFee / totalHours) : 0;
+
+            document.getElementById('netProfit').innerText = "$" + netProfit.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            document.getElementById('laborCost').innerText = "$" + laborCost.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            document.getElementById('marginPercent').innerText = Math.round(margin) + "%";
+            document.getElementById('effectiveRate').innerText = "$" + effectiveRate.toFixed(2) + "/hr";
+
+            const rateEl = document.getElementById('effectiveRate');
+            if (effectiveRate < rate) {
+                rateEl.style.color = "#ef4444";
+            } else {
+                rateEl.style.color = "#16a34a";
+            }
+        }
+
+        function copyEmbedCode() {
+            const iframeCode = `<iframe src="YOUR_HOSTED_URL_HERE" width="100%" height="800" frameborder="0" style="border:none; overflow:hidden;"></iframe>`;
+            document.addEventListener('copy', function(e) {
+                e.clipboardData.setData('text/plain', iframeCode);
+                e.preventDefault();
+            }, {once: true});
+            document.execCommand('copy');
+            alert("Iframe code copied! To use this, host this file on a service like GitHub Pages or Netlify, then paste the code into your Discourse topic.");
+        }
+
+        window.onload = calculate;
+    </script>
+</body>
+</html>
